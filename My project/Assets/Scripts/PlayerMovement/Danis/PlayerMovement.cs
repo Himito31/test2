@@ -2,8 +2,15 @@
 
 using System;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
+
+
+    //Dash
+    public float dashDistance = 5f; // Distance to dash
+    public float dashDuration = 0.2f;
+    private bool isDashing = false;
 
     //Assingables
     public Transform playerCam;
@@ -64,11 +71,59 @@ public class PlayerMovement : MonoBehaviour {
     private void Update() {
         MyInput();
         Look();
+
+
+        if (!isDashing && Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            // Check for input to trigger the dash
+            if (Input.GetKeyDown(KeyCode.W))
+                StartCoroutine(Dash(transform.forward)); // Dash forward
+            else if (Input.GetKeyDown(KeyCode.S))
+                StartCoroutine(Dash(-transform.forward)); // Dash backward
+            else if (Input.GetKeyDown(KeyCode.A))
+                StartCoroutine(Dash(-transform.right)); // Dash left
+            else if (Input.GetKeyDown(KeyCode.D))
+                StartCoroutine(Dash(transform.right)); // Dash right
+        }
     }
 
     /// <summary>
     /// Find user input. Should put this in its own class but im lazy
     /// </summary>
+    /// 
+
+
+    IEnumerator Dash(Vector3 direction)
+    {
+        isDashing = true;
+
+        // Calculate target position
+        Vector3 targetPos = transform.position + direction * dashDistance;
+
+        // Store initial position and time
+        Vector3 initialPos = transform.position;
+        float startTime = Time.time;
+
+        // Perform the dash over dashDuration seconds
+        while (Time.time - startTime < dashDuration)
+        {
+            // Calculate the percentage of completion
+            float percentage = (Time.time - startTime) / dashDuration;
+
+            // Interpolate towards the target position
+            transform.position = Vector3.Lerp(initialPos, targetPos, percentage);
+
+            // Wait for the next frame
+            yield return null;
+        }
+
+        // Ensure we reach the target position exactly
+        transform.position = targetPos;
+
+        isDashing = false;
+    }
+
+
     private void MyInput() {
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
@@ -266,5 +321,9 @@ public class PlayerMovement : MonoBehaviour {
     private void StopGrounded() {
         grounded = false;
     }
+
+
+    
+    
     
 }
