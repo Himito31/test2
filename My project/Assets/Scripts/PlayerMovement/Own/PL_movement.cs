@@ -7,7 +7,7 @@ public class PL_movement : MonoBehaviour
 
 
 
-     public float speed = 5f;
+     public float speed = 50f;
     public float sprintSpeed = 7f;
     public float jumpForce = 5f;
     public float slideForce = 10f;
